@@ -10,7 +10,7 @@ struct LauncherView: View {
     var allButtons: [LauncherButton] {
         configManager.buttons.flatMap { tab in
             tab.map { config in
-                LauncherButton(id: config.id, key: config.key, label: config.label, action: config.toLauncherAction())
+                LauncherButton(key: config.key, label: config.label, action: config.toLauncherAction())
             }
         }
     }
@@ -211,7 +211,7 @@ class KeyHandlingView: NSView {
         // Convert config buttons to launcher buttons (flatten all tabs)
         let allButtons = configManager.buttons.flatMap { tab in
             tab.map { config in
-                LauncherButton(id: config.id, key: config.key, label: config.label, action: config.toLauncherAction())
+                LauncherButton(key: config.key, label: config.label, action: config.toLauncherAction())
             }
         }
         
@@ -280,7 +280,7 @@ class KeyHandlingView: NSView {
 }
 
 struct LauncherButton: Identifiable {
-    let id: UUID
+    let id = UUID()
     let key: String
     let label: String
     var action: LauncherAction

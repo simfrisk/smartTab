@@ -1,0 +1,16 @@
+{
+  "source": "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/SmartTabApp.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Preferences...",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 137
+        }
+      }
+    ]
+  },
+  "version": 1
+}

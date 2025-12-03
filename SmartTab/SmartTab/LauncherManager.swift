@@ -105,7 +105,7 @@ private extension LauncherManager {
     func registerCarbonHotKey() -> Bool {
         unregisterCarbonHotKey()
         
-        var hotKeyID = EventHotKeyID(signature: Self.hotKeySignature, id: Self.hotKeyIdentifier)
+        let hotKeyID = EventHotKeyID(signature: Self.hotKeySignature, id: Self.hotKeyIdentifier)
         let modifiers = carbonModifiers(for: hotkeyConfig)
         let status = RegisterEventHotKey(UInt32(hotkeyConfig.keyCode), modifiers, hotKeyID, GetApplicationEventTarget(), 0, &hotKeyRef)
         

@@ -103,6 +103,8 @@ class StatusBarManager: ObservableObject {
         menu.addItem(quitItem)
         
         statusMenu = menu
+        // Keep menu property as nil by default - we'll show it manually on right-click
+        statusItem?.menu = nil
         print("✅ Status bar menu configured. Status bar should now be visible!")
     }
     
@@ -114,7 +116,9 @@ class StatusBarManager: ObservableObject {
         
         let isRightClick = event.type == .rightMouseUp || event.modifierFlags.contains(.control)
         if isRightClick, let menu = statusMenu {
-            statusItem?.popUpMenu(menu)
+            // Modern API: use menu.popUp to show menu at current mouse location
+            let location = NSEvent.mouseLocation
+            menu.popUp(positioning: nil, at: location, in: nil)
         } else {
             launcherManager?.toggleLauncher()
         }

@@ -127,67 +127,46 @@ struct PreferencesView: View {
             Divider()
             
             HStack(spacing: 0) {
-                // Left sidebar - button list
+                // Left side - visual keyboard
                 VStack(alignment: .leading, spacing: 0) {
-                    Text("Buttons")
+                    Text("Keyboard Layout")
                         .font(.headline)
                         .padding()
                     
                     ScrollView {
-                        VStack(alignment: .leading, spacing: 4) {
-                            // Show all buttons from all tabs
-                            ForEach(configManager.buttons.flatMap { $0 }) { button in
-                                Button(action: {
-                                    selectedButton = button
-                                }) {
-                                    HStack {
-                                        Text(button.key)
-                                            .font(.system(.body, design: .monospaced))
-                                            .frame(width: 30)
-                                        Text(button.label)
-                                        Spacer()
-                                        if button.actionType != .none {
-                                            Image(systemName: button.actionType == .launchApp ? "app" : "folder")
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(selectedButton?.id == button.id ? Color.accentColor.opacity(0.2) : Color.clear)
-                                    .cornerRadius(4)
-                                }
-                                .buttonStyle(PlainButtonStyle())
-                            }
-                        }
-                        .padding(.horizontal, 8)
+                        KeyboardLayoutView(
+                            configManager: configManager,
+                            selectedButton: $selectedButton
+                        )
+                        .padding()
                     }
                 }
-                .frame(width: 250)
+                .frame(width: 850)
                 .background(Color(NSColor.controlBackgroundColor))
                 
                 Divider()
                 
                 // Right side - editor
-                if let button = selectedButton {
-                    ButtonEditorView(
-                        button: button,
-                        configManager: configManager,
-                        onSave: { updatedButton in
-                            configManager.updateButton(config: updatedButton)
-                            selectedButton = updatedButton
-                        }
-                    )
-                    .frame(maxWidth: .infinity)
-                } else {
-                    VStack {
-                        Text("Select a button to edit")
+                VStack {
+                    if let button = selectedButton {
+                        ButtonEditorView(
+                            button: button,
+                            configManager: configManager,
+                            onSave: { updatedButton in
+                                configManager.updateButton(config: updatedButton)
+                                selectedButton = updatedButton
+                            }
+                        )
+                    } else {
+                        Text("Click on a key to configure it")
                             .foregroundColor(.secondary)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
+                .frame(minWidth: 500, maxWidth: 500)
+                .frame(maxHeight: .infinity)
             }
         }
-        .frame(width: 700, height: 500)
+        .frame(minWidth: 1400, minHeight: 700)
         .onChange(of: hotkeyRecorder.recordedHotkey) { oldValue, newValue in
             if let newValue = newValue {
                 configManager.hotkeyConfig = newValue
@@ -255,7 +234,7 @@ struct ButtonEditorView: View {
                 
                 if actionType != .none {
                     Section {
-                        HStack {
+                        VStack(alignment: .leading, spacing: 8) {
                             TextField("Path", text: $path)
                             Button("Browse...") {
                                 showingFilePicker = true
@@ -289,6 +268,12 @@ struct ButtonEditorView: View {
                 actionType: actionType,
                 selectedPath: $path
             )
+        }
+        .onChange(of: button.id) { oldValue, newValue in
+            // Update state when button changes
+            label = button.label
+            actionType = button.actionType
+            path = button.path
         }
     }
 }
@@ -367,6 +352,176 @@ struct FolderPickerView: View {
             .padding()
         }
         .frame(width: 400, height: 200)
+    }
+}
+
+struct KeyboardLayoutView: View {
+    @ObservedObject var configManager: ButtonConfigManager
+    @Binding var selectedButton: ButtonConfig?
+    
+    // Flatten all buttons from all tabs into a single array
+    var allButtons: [ButtonConfig] {
+        configManager.buttons.flatMap { $0 }
+    }
+    
+    var body: some View {
+        VStack(spacing: 10) {
+            // Row 1: Q-P (10 buttons) - gap between T and Y
+            HStack(spacing: 6) {
+                ForEach(Array(allButtons.prefix(5).enumerated()), id: \.element.id) { index, button in
+                    KeyboardKeyView(
+                        button: button,
+                        isSelected: selectedButton?.id == button.id,
+                        onTap: {
+                            selectedButton = button
+                        }
+                    )
+                }
+                Spacer().frame(width: 24) // Gap for split keyboard
+                ForEach(Array(allButtons.dropFirst(5).prefix(5)), id: \.id) { button in
+                    KeyboardKeyView(
+                        button: button,
+                        isSelected: selectedButton?.id == button.id,
+                        onTap: {
+                            selectedButton = button
+                        }
+                    )
+                }
+            }
+            
+            // Row 2: A-L, ; (10 buttons) - gap between G and H
+            HStack(spacing: 6) {
+                ForEach(Array(allButtons.dropFirst(10).prefix(5).enumerated()), id: \.element.id) { index, button in
+                    KeyboardKeyView(
+                        button: button,
+                        isSelected: selectedButton?.id == button.id,
+                        onTap: {
+                            selectedButton = button
+                        }
+                    )
+                }
+                Spacer().frame(width: 24) // Gap for split keyboard
+                ForEach(Array(allButtons.dropFirst(15).prefix(5)), id: \.id) { button in
+                    KeyboardKeyView(
+                        button: button,
+                        isSelected: selectedButton?.id == button.id,
+                        onTap: {
+                            selectedButton = button
+                        }
+                    )
+                }
+            }
+            
+            // Row 3: Z-M, comma, period, dash (10 buttons) - gap between B and N
+            HStack(spacing: 6) {
+                ForEach(Array(allButtons.dropFirst(20).prefix(5).enumerated()), id: \.element.id) { index, button in
+                    KeyboardKeyView(
+                        button: button,
+                        isSelected: selectedButton?.id == button.id,
+                        onTap: {
+                            selectedButton = button
+                        }
+                    )
+                }
+                Spacer().frame(width: 24) // Gap for split keyboard
+                ForEach(Array(allButtons.dropFirst(25).prefix(5)), id: \.id) { button in
+                    KeyboardKeyView(
+                        button: button,
+                        isSelected: selectedButton?.id == button.id,
+                        onTap: {
+                            selectedButton = button
+                        }
+                    )
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
+    }
+}
+
+struct KeyboardKeyView: View {
+    let button: ButtonConfig
+    let isSelected: Bool
+    let onTap: () -> Void
+    @State private var isHovered = false
+    @State private var appIcon: NSImage?
+    
+    var body: some View {
+        Button(action: onTap) {
+            VStack(spacing: 4) {
+                // Key letter at top
+                Text(button.key)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.primary)
+                
+                // Icon or label in center
+                if let icon = appIcon {
+                    Image(nsImage: icon)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 28, height: 28)
+                } else if button.actionType != .none {
+                    // Show action type icon if no app icon
+                    Image(systemName: button.actionType == .launchApp ? "app" : "folder")
+                        .font(.system(size: 18))
+                        .foregroundColor(.secondary)
+                } else {
+                    // Empty space for unassigned
+                    Spacer().frame(height: 18)
+                }
+                
+                // Label at bottom
+                if !button.label.isEmpty && button.label != button.key {
+                    Text(button.label)
+                        .font(.system(size: 8))
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Spacer().frame(height: 10)
+                }
+            }
+            .frame(width: 55, height: 75)
+            .padding(5)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(isSelected ? Color.accentColor.opacity(0.3) : 
+                          (isHovered ? Color.accentColor.opacity(0.1) : Color(NSColor.controlBackgroundColor)))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(isSelected ? Color.accentColor : Color.accentColor.opacity(0.2), lineWidth: isSelected ? 2 : 1)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+        .onHover { hovering in
+            isHovered = hovering
+        }
+        .onAppear {
+            loadAppIcon()
+        }
+        .onChange(of: button.path) { oldValue, newValue in
+            loadAppIcon()
+        }
+        .onChange(of: button.actionType) { oldValue, newValue in
+            loadAppIcon()
+        }
+    }
+    
+    func loadAppIcon() {
+        // Extract app path from action
+        if button.actionType == .launchApp {
+            // Check if file exists before getting icon
+            if FileManager.default.fileExists(atPath: button.path) {
+                appIcon = NSWorkspace.shared.icon(forFile: button.path)
+            } else {
+                appIcon = nil
+            }
+        } else {
+            appIcon = nil
+        }
     }
 }
 

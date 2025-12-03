@@ -20,7 +20,7 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
         window.isOpaque = false
         window.hasShadow = true
         window.level = .floating
-        window.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        window.collectionBehavior = [.fullScreenAuxiliary]
         window.isMovableByWindowBackground = false
         window.ignoresMouseEvents = false
         window.acceptsMouseMovedEvents = true
@@ -44,6 +44,8 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
             hostingView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
         
+        // Store reference to launcher view for key handling
+        containerView.launcherView = contentView
         containerView.launcherManager = launcherManager
         containerView.configManager = configManager
         
@@ -59,13 +61,34 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
     }
     
     func centerWindow() {
-        if let screen = NSScreen.main, let window = window {
-            let screenRect = screen.visibleFrame
-            let windowRect = window.frame
-            let x = (screenRect.width - windowRect.width) / 2 + screenRect.origin.x
-            let y = (screenRect.height - windowRect.height) / 2 + screenRect.origin.y
-            window.setFrameOrigin(NSPoint(x: x, y: y))
+        guard let window = window else { return }
+        
+        // Get the screen where the cursor is located
+        let mouseLocation = NSEvent.mouseLocation
+        var targetScreen: NSScreen? = nil
+        
+        // Find the screen that contains the mouse cursor
+        for screen in NSScreen.screens {
+            let screenFrame = screen.frame
+            // NSEvent.mouseLocation uses bottom-left origin, same as screen.frame
+            if screenFrame.contains(mouseLocation) {
+                targetScreen = screen
+                break
+            }
         }
+        
+        // Fallback to main screen if cursor not found on any screen
+        if targetScreen == nil {
+            targetScreen = NSScreen.main
+        }
+        
+        guard let screen = targetScreen else { return }
+        
+        let screenRect = screen.visibleFrame
+        let windowRect = window.frame
+        let x = (screenRect.width - windowRect.width) / 2 + screenRect.origin.x
+        let y = (screenRect.height - windowRect.height) / 2 + screenRect.origin.y
+        window.setFrameOrigin(NSPoint(x: x, y: y))
     }
     
     private var keyboardMonitor: Any?
@@ -83,12 +106,23 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
                 return event
             }
             
-            let handled = containerView.handleKeyEvent(event)
-            return handled ? nil : event
+            // Check for hotkey first before handling other events
+            if let launcherManager = containerView.launcherManager,
+               let configManager = containerView.configManager,
+               configManager.hotkeyConfig.matches(event: event) {
+                print("LauncherWindow: Hotkey detected in keyboardMonitor, toggling launcher")
+                DispatchQueue.main.async { [weak launcherManager] in
+                    launcherManager?.toggleLauncher()
+                }
+                return nil // Consume the event
+            }
+            
+            containerView.handleKeyEvent(event)
+            return nil // Consume the event
         }
         
         // Set up mouse monitoring to detect clicks outside the window
-        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
+        mouseMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] event in
             guard let self = self, let window = self.window else { return }
             
             // Check if click is outside the window
@@ -97,9 +131,7 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
             
             if !windowFrame.contains(clickLocation) {
                 // Click is outside the window, close the launcher
-                DispatchQueue.main.async {
-                    self.launcherManager.isVisible = false
-                }
+                self.launcherManager.isVisible = false
             }
         }
         
@@ -134,6 +166,7 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
 }
 
 class KeyEventContainerView: NSView {
+    var launcherView: LauncherView?
     var launcherManager: LauncherManager?
     var configManager: ButtonConfigManager?
     
@@ -165,36 +198,73 @@ class KeyEventContainerView: NSView {
     
     override func keyDown(with event: NSEvent) {
         print("KeyEventContainerView: keyDown received - key: '\(event.charactersIgnoringModifiers ?? "")', keyCode: \(event.keyCode)")
-        if !handleKeyEvent(event) {
-            print("KeyEventContainerView: No handler processed event, calling super")
+        
+        // First check if this is the hotkey - if so, toggle the launcher
+        if let launcherManager = launcherManager,
+           let configManager = configManager,
+           configManager.hotkeyConfig.matches(event: event) {
+            print("KeyEventContainerView: Hotkey detected in keyDown, toggling launcher")
+            launcherManager.toggleLauncher()
+            return
+        }
+        
+        // Try to find and use the KeyHandlingView first
+        if let keyHandler = findKeyHandler(in: subviews) {
+            print("KeyEventContainerView: Found KeyHandlingView, forwarding event")
+            keyHandler.keyDown(with: event)
+            return
+        }
+        
+        // Fallback: handle directly if we have the launcher view
+        if let launcherView = launcherView {
+            print("KeyEventContainerView: Using launcher view directly")
+            handleKeyEvent(event, in: launcherView)
+        } else {
+            print("KeyEventContainerView: No handler found, calling super")
             super.keyDown(with: event)
         }
     }
     
-    @discardableResult
-    func handleKeyEvent(_ event: NSEvent) -> Bool {
+    func handleKeyEvent(_ event: NSEvent) {
         print("KeyEventContainerView: handleKeyEvent - key: '\(event.charactersIgnoringModifiers ?? "")', keyCode: \(event.keyCode)")
         
+        // First check if this is the hotkey - if so, toggle the launcher
         if let launcherManager = launcherManager,
            let configManager = configManager,
            configManager.hotkeyConfig.matches(event: event) {
             print("KeyEventContainerView: Hotkey detected, toggling launcher")
             launcherManager.toggleLauncher()
-            return true
+            return
         }
         
+        // Try to find and use the KeyHandlingView first
         if let keyHandler = findKeyHandler(in: subviews) {
             print("KeyEventContainerView: Found KeyHandlingView, forwarding event")
             keyHandler.keyDown(with: event)
-            return true
+            return
         }
         
+        // ESC to close
         if event.keyCode == 53 {
             launcherManager?.isVisible = false
-            return true
+        }
+    }
+    
+    private func handleKeyEvent(_ event: NSEvent, in launcherView: LauncherView) {
+        // First check if this is the hotkey - if so, toggle the launcher
+        if let launcherManager = launcherManager,
+           let configManager = configManager,
+           configManager.hotkeyConfig.matches(event: event) {
+            print("KeyEventContainerView: Hotkey detected in fallback handler, toggling launcher")
+            launcherManager.toggleLauncher()
+            return
         }
         
-        return false
+        // This is a fallback - the KeyHandlingView should handle this normally
+        // ESC to close
+        if event.keyCode == 53 {
+            launcherManager?.isVisible = false
+        }
     }
     
     private func findKeyHandler(in views: [NSView]) -> KeyHandlingView? {

@@ -1,0 +1,12 @@
+{
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/ButtonConfig.swift" : {
+    "abi-baseline-json" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab.abi.json",
+    "const-values" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary.swiftconstvalues",
+    "dependencies" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary.d",
+    "diagnostics" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary.dia",
+    "objc-header" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-Swift.h",
+    "swiftdoc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab.swiftdoc",
+    "swiftmodule" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab.swiftmodule",
+    "swiftsourceinfo" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab.swiftsourceinfo"
+  }
+}

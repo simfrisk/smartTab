@@ -170,7 +170,7 @@ class ButtonConfigManager: ObservableObject {
         }
         
         for rowIndex in 0..<min(updatedButtons.count, Self.defaultLayout.count) {
-            var row = updatedButtons[rowIndex]
+            let row = updatedButtons[rowIndex]
             let defaults = Self.defaultLayout[rowIndex]
             
             var buttonsByKey = [String: ButtonConfig]()
