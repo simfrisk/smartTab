@@ -62,6 +62,7 @@ struct PreferencesView: View {
     @ObservedObject var configManager: ButtonConfigManager
     @ObservedObject var launcherManager: LauncherManager
     @StateObject private var hotkeyRecorder = HotkeyRecorder()
+    @StateObject private var secondaryHotkeyRecorder = HotkeyRecorder()
     @State private var selectedTab = 0
     @State private var selectedButton: ButtonConfig?
     @State private var showingFilePicker = false
@@ -123,9 +124,65 @@ struct PreferencesView: View {
                 .padding(.bottom, 12)
             }
             .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
-            
+
             Divider()
-            
+
+            // Secondary Hotkey Settings Section
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Secondary Hotkey (Optional)")
+                    .font(.headline)
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+
+                HStack {
+                    Text("Current hotkey:")
+                        .foregroundColor(.secondary)
+
+                    if let secondaryConfig = configManager.secondaryHotkeyConfig {
+                        Text(secondaryConfig.displayString())
+                            .font(.system(.body, design: .monospaced))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color(NSColor.controlBackgroundColor))
+                            .cornerRadius(4)
+                    } else {
+                        Text("Not set")
+                            .foregroundColor(.secondary)
+                            .italic()
+                    }
+
+                    Spacer()
+
+                    if configManager.secondaryHotkeyConfig != nil {
+                        Button("Clear") {
+                            configManager.clearSecondaryHotkey()
+                        }
+                        .buttonStyle(.bordered)
+                    }
+
+                    if secondaryHotkeyRecorder.isRecording {
+                        Button("Cancel") {
+                            secondaryHotkeyRecorder.stopRecording()
+                        }
+                        .buttonStyle(.bordered)
+
+                        Text("Press new hotkey...")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                    } else {
+                        Button(configManager.secondaryHotkeyConfig == nil ? "Set Shortcut" : "Reassign") {
+                            secondaryHotkeyRecorder.startRecording()
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 12)
+            }
+            .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+
+            Divider()
+
             HStack(spacing: 0) {
                 // Left side - visual keyboard
                 VStack(alignment: .leading, spacing: 0) {
@@ -170,6 +227,11 @@ struct PreferencesView: View {
         .onChange(of: hotkeyRecorder.recordedHotkey) { oldValue, newValue in
             if let newValue = newValue {
                 configManager.hotkeyConfig = newValue
+            }
+        }
+        .onChange(of: secondaryHotkeyRecorder.recordedHotkey) { oldValue, newValue in
+            if let newValue = newValue {
+                configManager.secondaryHotkeyConfig = newValue
             }
         }
     }

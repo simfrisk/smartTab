@@ -57,8 +57,8 @@ struct SmartTabApp: App {
     init() {
         let configManager = ButtonConfigManager()
         _configManager = StateObject(wrappedValue: configManager)
-        _launcherManager = StateObject(wrappedValue: LauncherManager(hotkeyConfig: configManager.hotkeyConfig))
-        
+        _launcherManager = StateObject(wrappedValue: LauncherManager(hotkeyConfig: configManager.hotkeyConfig, secondaryHotkeyConfig: configManager.secondaryHotkeyConfig))
+
         // Ensure the app is set up as an accessory (background) app
         // This is important for global hotkeys to work
         DispatchQueue.main.async {
@@ -142,6 +142,10 @@ struct SmartTabApp: App {
         }
         .onChange(of: configManager.hotkeyConfig) { oldValue, newValue in
             launcherManager.updateHotkeyConfig(newValue)
+            statusBarManager.updateMenu()
+        }
+        .onChange(of: configManager.secondaryHotkeyConfig) { oldValue, newValue in
+            launcherManager.updateSecondaryHotkeyConfig(newValue)
             statusBarManager.updateMenu()
         }
         .onChange(of: launcherManager.isVisible) { oldValue, newValue in

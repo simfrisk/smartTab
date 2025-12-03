@@ -108,13 +108,21 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
             
             // Check for hotkey first before handling other events
             if let launcherManager = containerView.launcherManager,
-               let configManager = containerView.configManager,
-               configManager.hotkeyConfig.matches(event: event) {
-                print("LauncherWindow: Hotkey detected in keyboardMonitor, toggling launcher")
-                DispatchQueue.main.async { [weak launcherManager] in
-                    launcherManager?.toggleLauncher()
+               let configManager = containerView.configManager {
+                if configManager.hotkeyConfig.matches(event: event) {
+                    print("LauncherWindow: Hotkey detected in keyboardMonitor, toggling launcher")
+                    DispatchQueue.main.async { [weak launcherManager] in
+                        launcherManager?.toggleLauncher()
+                    }
+                    return nil // Consume the event
+                } else if let secondaryConfig = configManager.secondaryHotkeyConfig,
+                          secondaryConfig.matches(event: event) {
+                    print("LauncherWindow: Secondary hotkey detected in keyboardMonitor, toggling launcher")
+                    DispatchQueue.main.async { [weak launcherManager] in
+                        launcherManager?.toggleLauncher()
+                    }
+                    return nil // Consume the event
                 }
-                return nil // Consume the event
             }
             
             containerView.handleKeyEvent(event)
@@ -201,11 +209,17 @@ class KeyEventContainerView: NSView {
         
         // First check if this is the hotkey - if so, toggle the launcher
         if let launcherManager = launcherManager,
-           let configManager = configManager,
-           configManager.hotkeyConfig.matches(event: event) {
-            print("KeyEventContainerView: Hotkey detected in keyDown, toggling launcher")
-            launcherManager.toggleLauncher()
-            return
+           let configManager = configManager {
+            if configManager.hotkeyConfig.matches(event: event) {
+                print("KeyEventContainerView: Hotkey detected in keyDown, toggling launcher")
+                launcherManager.toggleLauncher()
+                return
+            } else if let secondaryConfig = configManager.secondaryHotkeyConfig,
+                      secondaryConfig.matches(event: event) {
+                print("KeyEventContainerView: Secondary hotkey detected in keyDown, toggling launcher")
+                launcherManager.toggleLauncher()
+                return
+            }
         }
         
         // Try to find and use the KeyHandlingView first
@@ -227,14 +241,20 @@ class KeyEventContainerView: NSView {
     
     func handleKeyEvent(_ event: NSEvent) {
         print("KeyEventContainerView: handleKeyEvent - key: '\(event.charactersIgnoringModifiers ?? "")', keyCode: \(event.keyCode)")
-        
+
         // First check if this is the hotkey - if so, toggle the launcher
         if let launcherManager = launcherManager,
-           let configManager = configManager,
-           configManager.hotkeyConfig.matches(event: event) {
-            print("KeyEventContainerView: Hotkey detected, toggling launcher")
-            launcherManager.toggleLauncher()
-            return
+           let configManager = configManager {
+            if configManager.hotkeyConfig.matches(event: event) {
+                print("KeyEventContainerView: Hotkey detected, toggling launcher")
+                launcherManager.toggleLauncher()
+                return
+            } else if let secondaryConfig = configManager.secondaryHotkeyConfig,
+                      secondaryConfig.matches(event: event) {
+                print("KeyEventContainerView: Secondary hotkey detected, toggling launcher")
+                launcherManager.toggleLauncher()
+                return
+            }
         }
         
         // Try to find and use the KeyHandlingView first
@@ -253,11 +273,17 @@ class KeyEventContainerView: NSView {
     private func handleKeyEvent(_ event: NSEvent, in launcherView: LauncherView) {
         // First check if this is the hotkey - if so, toggle the launcher
         if let launcherManager = launcherManager,
-           let configManager = configManager,
-           configManager.hotkeyConfig.matches(event: event) {
-            print("KeyEventContainerView: Hotkey detected in fallback handler, toggling launcher")
-            launcherManager.toggleLauncher()
-            return
+           let configManager = configManager {
+            if configManager.hotkeyConfig.matches(event: event) {
+                print("KeyEventContainerView: Hotkey detected in fallback handler, toggling launcher")
+                launcherManager.toggleLauncher()
+                return
+            } else if let secondaryConfig = configManager.secondaryHotkeyConfig,
+                      secondaryConfig.matches(event: event) {
+                print("KeyEventContainerView: Secondary hotkey detected in fallback handler, toggling launcher")
+                launcherManager.toggleLauncher()
+                return
+            }
         }
         
         // This is a fallback - the KeyHandlingView should handle this normally

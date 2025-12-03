@@ -222,6 +222,18 @@ class KeyHandlingView: NSView {
                 }
             }
             return
+        } else if let secondaryConfig = configManager.secondaryHotkeyConfig,
+                  secondaryConfig.matches(event: event) {
+            print("KeyHandlingView: Secondary hotkey detected, toggling launcher")
+            // Ensure we update on main thread
+            if Thread.isMainThread {
+                launcherManager?.toggleLauncher()
+            } else {
+                DispatchQueue.main.async { [weak self] in
+                    self?.launcherManager?.toggleLauncher()
+                }
+            }
+            return
         }
         
         // Convert config buttons to launcher buttons (flatten all tabs)

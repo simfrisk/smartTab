@@ -9,26 +9,36 @@ class LauncherManager: ObservableObject {
     private var globalMonitor: Any?
     private var localMonitor: Any?
     private var hotKeyRef: EventHotKeyRef?
+    private var secondaryHotKeyRef: EventHotKeyRef?
     private var hotKeyEventHandler: EventHandlerRef?
     private var hotkeyConfig: HotkeyConfig
+    private var secondaryHotkeyConfig: HotkeyConfig?
     private var hotkeyConfigCancellable: AnyCancellable?
-    
+
     private static let hotKeySignature: FourCharCode = 0x534D5442 // 'SMTB'
     private static let hotKeyIdentifier: UInt32 = 1
-    
-    init(hotkeyConfig: HotkeyConfig = HotkeyConfig()) {
+    private static let secondaryHotKeyIdentifier: UInt32 = 2
+
+    init(hotkeyConfig: HotkeyConfig = HotkeyConfig(), secondaryHotkeyConfig: HotkeyConfig? = nil) {
         self.hotkeyConfig = hotkeyConfig
+        self.secondaryHotkeyConfig = secondaryHotkeyConfig
         setupGlobalHotkey()
     }
-    
+
     func updateHotkeyConfig(_ config: HotkeyConfig) {
         hotkeyConfig = config
+        setupGlobalHotkey()
+    }
+
+    func updateSecondaryHotkeyConfig(_ config: HotkeyConfig?) {
+        secondaryHotkeyConfig = config
         setupGlobalHotkey()
     }
     
     private func removeMonitors() {
         unregisterCarbonHotKey()
-        
+        unregisterSecondaryCarbonHotKey()
+
         if let monitor = globalMonitor {
             NSEvent.removeMonitor(monitor)
             globalMonitor = nil
@@ -38,16 +48,25 @@ class LauncherManager: ObservableObject {
             localMonitor = nil
         }
     }
-    
+
     func setupGlobalHotkey() {
         removeMonitors()
         installHotKeyHandlerIfNeeded()
-        
+
         if registerCarbonHotKey() {
             print("✅ Carbon hotkey registered. Press \(hotkeyConfig.displayString()) to open launcher.")
         } else {
             print("⚠️ Unable to register Carbon hotkey. Falling back to Accessibility-based event monitors.")
             registerAccessibilityFallback()
+        }
+
+        // Register secondary hotkey if configured
+        if let secondaryConfig = secondaryHotkeyConfig {
+            if registerSecondaryCarbonHotKey() {
+                print("✅ Secondary Carbon hotkey registered. Press \(secondaryConfig.displayString()) to open launcher.")
+            } else {
+                print("⚠️ Unable to register secondary Carbon hotkey. It will be handled by the fallback monitor.")
+            }
         }
     }
     
@@ -125,7 +144,35 @@ private extension LauncherManager {
             self.hotKeyRef = nil
         }
     }
-    
+
+    func registerSecondaryCarbonHotKey() -> Bool {
+        unregisterSecondaryCarbonHotKey()
+
+        guard let config = secondaryHotkeyConfig else {
+            return false
+        }
+
+        let hotKeyID = EventHotKeyID(signature: Self.hotKeySignature, id: Self.secondaryHotKeyIdentifier)
+        let modifiers = carbonModifiers(for: config)
+        let status = RegisterEventHotKey(UInt32(config.keyCode), modifiers, hotKeyID, GetApplicationEventTarget(), 0, &secondaryHotKeyRef)
+
+        if status != noErr {
+            print("❌ RegisterEventHotKey (secondary) failed with status \(status)")
+            secondaryHotKeyRef = nil
+            return false
+        }
+
+        print("✅ Registered secondary Carbon hotkey: \(config.displayString())")
+        return true
+    }
+
+    func unregisterSecondaryCarbonHotKey() {
+        if let hotKeyRef = secondaryHotKeyRef {
+            UnregisterEventHotKey(hotKeyRef)
+            self.secondaryHotKeyRef = nil
+        }
+    }
+
     func handleCarbonHotKey() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
@@ -158,11 +205,19 @@ private extension LauncherManager {
         
         globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self = self else { return }
-            
+
             if self.hotkeyConfig.matches(event: event) {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     print("🌐 Global hotkey detected via fallback monitor: \(self.hotkeyConfig.displayString())")
+                    NSApp.activate(ignoringOtherApps: true)
+                    self.isVisible.toggle()
+                }
+            } else if let secondaryConfig = self.secondaryHotkeyConfig,
+                      secondaryConfig.matches(event: event) {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    print("🌐 Secondary global hotkey detected via fallback monitor: \(secondaryConfig.displayString())")
                     NSApp.activate(ignoringOtherApps: true)
                     self.isVisible.toggle()
                 }
@@ -181,11 +236,19 @@ private extension LauncherManager {
         
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self = self else { return event }
-            
+
             if self.hotkeyConfig.matches(event: event) {
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     print("⌨️ Local hotkey detected via fallback monitor: \(self.hotkeyConfig.displayString())")
+                    self.isVisible.toggle()
+                }
+                return nil
+            } else if let secondaryConfig = self.secondaryHotkeyConfig,
+                      secondaryConfig.matches(event: event) {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    print("⌨️ Local secondary hotkey detected via fallback monitor: \(secondaryConfig.displayString())")
                     self.isVisible.toggle()
                 }
                 return nil

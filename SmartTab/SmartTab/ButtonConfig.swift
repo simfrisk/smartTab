@@ -114,10 +114,16 @@ class ButtonConfigManager: ObservableObject {
             saveHotkeyConfig()
         }
     }
+    @Published var secondaryHotkeyConfig: HotkeyConfig? {
+        didSet {
+            saveSecondaryHotkeyConfig()
+        }
+    }
     private let defaults = UserDefaults.standard
     private let buttonsKey = "SmartTabButtonConfigs"
     private let hotkeyKey = "SmartTabHotkeyConfig"
-    
+    private let secondaryHotkeyKey = "SmartTabSecondaryHotkeyConfig"
+
     init() {
         if let data = defaults.data(forKey: hotkeyKey),
            let decoded = try? JSONDecoder().decode(HotkeyConfig.self, from: data) {
@@ -125,7 +131,14 @@ class ButtonConfigManager: ObservableObject {
         } else {
             hotkeyConfig = HotkeyConfig(keyCode: 16, command: true, shift: true, option: false, control: false)
         }
-        
+
+        if let data = defaults.data(forKey: secondaryHotkeyKey),
+           let decoded = try? JSONDecoder().decode(HotkeyConfig.self, from: data) {
+            secondaryHotkeyConfig = decoded
+        } else {
+            secondaryHotkeyConfig = nil
+        }
+
         loadConfigurations()
         if buttons.isEmpty {
             createDefaultConfigurations()
@@ -236,7 +249,22 @@ class ButtonConfigManager: ObservableObject {
             print("Saved hotkey configuration: \(hotkeyConfig.displayString())")
         }
     }
-    
+
+    func saveSecondaryHotkeyConfig() {
+        if let config = secondaryHotkeyConfig,
+           let encoded = try? JSONEncoder().encode(config) {
+            defaults.set(encoded, forKey: secondaryHotkeyKey)
+            print("Saved secondary hotkey configuration: \(config.displayString())")
+        } else {
+            defaults.removeObject(forKey: secondaryHotkeyKey)
+            print("Cleared secondary hotkey configuration")
+        }
+    }
+
+    func clearSecondaryHotkey() {
+        secondaryHotkeyConfig = nil
+    }
+
     private func makeButton(from definition: DefaultButtonDefinition) -> ButtonConfig {
         ButtonConfig(
             key: definition.key,
