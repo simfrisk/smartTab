@@ -147,7 +147,7 @@ struct LauncherView: View {
                 print("App launched successfully with open")
                 // Find the app that was just launched and move cursor to it
                 if let appName = url.deletingPathExtension().lastPathComponent as String? {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                         if let app = NSWorkspace.shared.runningApplications.first(where: {
                             $0.localizedName == appName || $0.bundleURL == url
                         }) {
@@ -289,7 +289,7 @@ class KeyHandlingView: NSView {
             print("App launched successfully with open")
             // Find the app that was just launched and move cursor to it
             if let appName = url.deletingPathExtension().lastPathComponent as String? {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                     if let app = NSWorkspace.shared.runningApplications.first(where: {
                         $0.localizedName == appName || $0.bundleURL == url
                     }) {
@@ -328,7 +328,7 @@ class CursorMover {
     /// Moves the cursor to the center of the frontmost window of the specified application
     static func moveCursorToFrontmostWindow(of app: NSRunningApplication) {
         // Give the app a moment to fully activate and bring its window forward
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
             guard let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
                 print("Failed to get window list")
                 return
