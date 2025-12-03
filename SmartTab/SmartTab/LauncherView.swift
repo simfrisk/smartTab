@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import ApplicationServices
 
 struct LauncherView: View {
     @ObservedObject var launcherManager: LauncherManager
@@ -137,15 +138,30 @@ struct LauncherView: View {
                         print("Error launching app at \(path): \(error.localizedDescription)")
                     } else {
                         print("App launched successfully with openApplication")
+                        if let app = app {
+                            CursorMover.moveCursorToFrontmostWindow(of: app)
+                        }
                     }
                 }
             } else {
                 print("App launched successfully with open")
+                // Find the app that was just launched and move cursor to it
+                if let appName = url.deletingPathExtension().lastPathComponent as String? {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        if let app = NSWorkspace.shared.runningApplications.first(where: {
+                            $0.localizedName == appName || $0.bundleURL == url
+                        }) {
+                            CursorMover.moveCursorToFrontmostWindow(of: app)
+                        }
+                    }
+                }
             }
             launcherManager.isVisible = false
         case .openFolder(let path):
             print("Opening folder at: \(path)")
             NSWorkspace.shared.open(URL(fileURLWithPath: path))
+            // Move cursor to Finder window
+            CursorMover.moveCursorToFinderWindow()
             launcherManager.isVisible = false
         }
     }
@@ -264,16 +280,31 @@ class KeyHandlingView: NSView {
                     print("Error launching app at \(path): \(error.localizedDescription)")
                 } else {
                     print("App launched successfully with openApplication")
+                    if let app = app {
+                        CursorMover.moveCursorToFrontmostWindow(of: app)
+                    }
                 }
             }
         } else {
             print("App launched successfully with open")
+            // Find the app that was just launched and move cursor to it
+            if let appName = url.deletingPathExtension().lastPathComponent as String? {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    if let app = NSWorkspace.shared.runningApplications.first(where: {
+                        $0.localizedName == appName || $0.bundleURL == url
+                    }) {
+                        CursorMover.moveCursorToFrontmostWindow(of: app)
+                    }
+                }
+            }
         }
         launcherManager?.isVisible = false
     }
-    
+
     func openFolder(path: String) {
         NSWorkspace.shared.open(URL(fileURLWithPath: path))
+        // Move cursor to Finder window
+        CursorMover.moveCursorToFinderWindow()
         launcherManager?.isVisible = false
     }
     
@@ -290,6 +321,64 @@ enum LauncherAction {
     case none
     case launchApp(path: String)
     case openFolder(path: String)
+}
+
+// MARK: - Cursor Movement Utility
+class CursorMover {
+    /// Moves the cursor to the center of the frontmost window of the specified application
+    static func moveCursorToFrontmostWindow(of app: NSRunningApplication) {
+        // Give the app a moment to fully activate and bring its window forward
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            guard let windows = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] else {
+                print("Failed to get window list")
+                return
+            }
+
+            // Find the frontmost window of this app
+            let targetPID = app.processIdentifier
+
+            for window in windows {
+                guard let pid = window[kCGWindowOwnerPID as String] as? pid_t,
+                      pid == targetPID,
+                      let bounds = window[kCGWindowBounds as String] as? [String: CGFloat],
+                      let x = bounds["X"],
+                      let y = bounds["Y"],
+                      let width = bounds["Width"],
+                      let height = bounds["Height"],
+                      let layer = window[kCGWindowLayer as String] as? Int,
+                      layer == 0 else { // Layer 0 is normal window layer
+                    continue
+                }
+
+                // Calculate center point
+                let centerX = x + width / 2
+                let centerY = y + height / 2
+
+                print("Moving cursor to window center: (\(centerX), \(centerY))")
+
+                // Move cursor to center of window
+                let point = CGPoint(x: centerX, y: centerY)
+                CGWarpMouseCursorPosition(point)
+
+                // Only move to the first (frontmost) window
+                return
+            }
+
+            print("No suitable window found for app \(app.localizedName ?? "unknown")")
+        }
+    }
+
+    /// Moves the cursor to the center of the Finder window showing the specified folder
+    static func moveCursorToFinderWindow() {
+        // Find Finder process
+        let workspace = NSWorkspace.shared
+        guard let finder = workspace.runningApplications.first(where: { $0.bundleIdentifier == "com.apple.finder" }) else {
+            print("Finder not found")
+            return
+        }
+
+        moveCursorToFrontmostWindow(of: finder)
+    }
 }
 
 struct LauncherButtonView: View {
