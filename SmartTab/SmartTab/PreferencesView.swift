@@ -14,15 +14,15 @@ class HotkeyRecorder: ObservableObject {
         
         monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             guard let self = self, self.isRecording else { return event }
-            
+
             let keyCode = event.keyCode
             let flags = event.modifierFlags
-            
+
             // Don't allow just modifier keys (54-57 are modifier key codes)
             if keyCode >= 54 && keyCode <= 57 {
                 return event
             }
-            
+
             let newConfig = HotkeyConfig(
                 keyCode: keyCode,
                 command: flags.contains(.command),
@@ -30,9 +30,11 @@ class HotkeyRecorder: ObservableObject {
                 option: flags.contains(.option),
                 control: flags.contains(.control)
             )
-            
-            // Require at least one modifier
-            if newConfig.command || newConfig.shift || newConfig.option || newConfig.control {
+
+            // Special exception: keyCode 10 is § key, allow it without modifiers
+            // Otherwise require at least one modifier
+            let isSectionKey = keyCode == 10
+            if isSectionKey || newConfig.command || newConfig.shift || newConfig.option || newConfig.control {
                 DispatchQueue.main.async {
                     self.recordedHotkey = newConfig
                     self.isRecording = false
@@ -40,7 +42,7 @@ class HotkeyRecorder: ObservableObject {
                 self.stopRecording()
                 return nil // Consume the event
             }
-            
+
             return event
         }
     }
