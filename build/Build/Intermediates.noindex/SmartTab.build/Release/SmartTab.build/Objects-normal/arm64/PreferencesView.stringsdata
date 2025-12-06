@@ -4,18 +4,98 @@
     "Localizable": [
       {
         "comment": "",
+        "key": "Export Successful",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 109
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import Successful",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 114
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import Failed",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 119
+        }
+      },
+      {
+        "comment": "",
         "key": "SmartTab Preferences",
         "location": {
           "startingColumn": 22,
-          "startingLine": 75
+          "startingLine": 79
+        }
+      },
+      {
+        "comment": "",
+        "key": "Export Config",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 84
+        }
+      },
+      {
+        "comment": "",
+        "key": "Import Config",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 91
         }
       },
       {
         "comment": "",
         "key": "Done",
         "location": {
+          "startingColumn": 28,
+          "startingLine": 101
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
           "startingColumn": 24,
-          "startingLine": 79
+          "startingLine": 110
+        }
+      },
+      {
+        "comment": "",
+        "key": "Configuration exported successfully!",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 112
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 115
+        }
+      },
+      {
+        "comment": "",
+        "key": "Configuration imported successfully! The launcher will use the new settings.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 117
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 120
         }
       },
       {
@@ -23,7 +103,7 @@
         "key": "Global Hotkey",
         "location": {
           "startingColumn": 22,
-          "startingLine": 90
+          "startingLine": 129
         }
       },
       {
@@ -31,7 +111,7 @@
         "key": "Current hotkey:",
         "location": {
           "startingColumn": 26,
-          "startingLine": 96
+          "startingLine": 135
         }
       },
       {
@@ -39,7 +119,7 @@
         "key": "Press new hotkey...",
         "location": {
           "startingColumn": 30,
-          "startingLine": 113
+          "startingLine": 152
         }
       },
       {
@@ -47,7 +127,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 32,
-          "startingLine": 108
+          "startingLine": 147
         }
       },
       {
@@ -55,7 +135,7 @@
         "key": "Reassign",
         "location": {
           "startingColumn": 32,
-          "startingLine": 117
+          "startingLine": 156
         }
       },
       {
@@ -63,7 +143,7 @@
         "key": "Secondary Hotkey (Optional)",
         "location": {
           "startingColumn": 22,
-          "startingLine": 132
+          "startingLine": 171
         }
       },
       {
@@ -71,7 +151,7 @@
         "key": "Current hotkey:",
         "location": {
           "startingColumn": 26,
-          "startingLine": 138
+          "startingLine": 177
         }
       },
       {
@@ -79,7 +159,7 @@
         "key": "Not set",
         "location": {
           "startingColumn": 30,
-          "startingLine": 149
+          "startingLine": 188
         }
       },
       {
@@ -87,7 +167,7 @@
         "key": "Press new hotkey...",
         "location": {
           "startingColumn": 30,
-          "startingLine": 169
+          "startingLine": 208
         }
       },
       {
@@ -95,7 +175,7 @@
         "key": "Clear",
         "location": {
           "startingColumn": 32,
-          "startingLine": 157
+          "startingLine": 196
         }
       },
       {
@@ -103,7 +183,7 @@
         "key": "Cancel",
         "location": {
           "startingColumn": 32,
-          "startingLine": 164
+          "startingLine": 203
         }
       },
       {
@@ -111,7 +191,7 @@
         "key": "Set Shortcut",
         "location": {
           "startingColumn": 77,
-          "startingLine": 173
+          "startingLine": 212
         }
       },
       {
@@ -119,7 +199,7 @@
         "key": "Reassign",
         "location": {
           "startingColumn": 94,
-          "startingLine": 173
+          "startingLine": 212
         }
       },
       {
@@ -127,7 +207,7 @@
         "key": "Keyboard Layout",
         "location": {
           "startingColumn": 26,
-          "startingLine": 189
+          "startingLine": 228
         }
       },
       {
@@ -135,7 +215,7 @@
         "key": "Click on a key to configure it",
         "location": {
           "startingColumn": 30,
-          "startingLine": 218
+          "startingLine": 257
         }
       },
       {
@@ -143,7 +223,7 @@
         "key": "Edit Button: %@",
         "location": {
           "startingColumn": 18,
-          "startingLine": 274
+          "startingLine": 313
         }
       },
       {
@@ -151,7 +231,7 @@
         "key": "Label",
         "location": {
           "startingColumn": 31,
-          "startingLine": 281
+          "startingLine": 320
         }
       },
       {
@@ -159,7 +239,7 @@
         "key": "Display Label",
         "location": {
           "startingColumn": 26,
-          "startingLine": 283
+          "startingLine": 322
         }
       },
       {
@@ -167,7 +247,7 @@
         "key": "Action",
         "location": {
           "startingColumn": 28,
-          "startingLine": 287
+          "startingLine": 326
         }
       },
       {
@@ -175,7 +255,7 @@
         "key": "None",
         "location": {
           "startingColumn": 30,
-          "startingLine": 288
+          "startingLine": 327
         }
       },
       {
@@ -183,7 +263,7 @@
         "key": "Launch App",
         "location": {
           "startingColumn": 30,
-          "startingLine": 289
+          "startingLine": 328
         }
       },
       {
@@ -191,7 +271,7 @@
         "key": "Open Folder",
         "location": {
           "startingColumn": 30,
-          "startingLine": 290
+          "startingLine": 329
         }
       },
       {
@@ -199,7 +279,7 @@
         "key": "Action Type",
         "location": {
           "startingColumn": 26,
-          "startingLine": 294
+          "startingLine": 333
         }
       },
       {
@@ -207,7 +287,7 @@
         "key": "Path",
         "location": {
           "startingColumn": 39,
-          "startingLine": 300
+          "startingLine": 339
         }
       },
       {
@@ -215,7 +295,7 @@
         "key": "Browse...",
         "location": {
           "startingColumn": 36,
-          "startingLine": 301
+          "startingLine": 340
         }
       },
       {
@@ -223,7 +303,7 @@
         "key": "Application Path",
         "location": {
           "startingColumn": 57,
-          "startingLine": 306
+          "startingLine": 345
         }
       },
       {
@@ -231,7 +311,7 @@
         "key": "Folder Path",
         "location": {
           "startingColumn": 78,
-          "startingLine": 306
+          "startingLine": 345
         }
       },
       {
@@ -239,7 +319,7 @@
         "key": "Save",
         "location": {
           "startingColumn": 24,
-          "startingLine": 314
+          "startingLine": 353
         }
       },
       {
@@ -247,7 +327,7 @@
         "key": "Select Application",
         "location": {
           "startingColumn": 18,
-          "startingLine": 363
+          "startingLine": 402
         }
       },
       {
@@ -255,7 +335,7 @@
         "key": "Choose Application...",
         "location": {
           "startingColumn": 20,
-          "startingLine": 367
+          "startingLine": 406
         }
       },
       {
@@ -263,7 +343,7 @@
         "key": "Select Folder",
         "location": {
           "startingColumn": 18,
-          "startingLine": 395
+          "startingLine": 434
         }
       },
       {
@@ -271,7 +351,7 @@
         "key": "Choose Folder...",
         "location": {
           "startingColumn": 20,
-          "startingLine": 399
+          "startingLine": 438
         }
       }
     ]

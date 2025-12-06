@@ -1,6 +1,7 @@
 import Foundation
 import Combine
 import AppKit
+import UniformTypeIdentifiers
 
 struct HotkeyConfig: Codable, Equatable {
     var keyCode: UInt16
@@ -104,6 +105,20 @@ struct ButtonConfig: Codable, Identifiable {
         case .openFolder:
             return .openFolder(path: path)
         }
+    }
+}
+
+struct SmartTabConfig: Codable {
+    let buttons: [[ButtonConfig]]
+    let hotkeyConfig: HotkeyConfig
+    let secondaryHotkeyConfig: HotkeyConfig?
+    let version: String
+    
+    init(buttons: [[ButtonConfig]], hotkeyConfig: HotkeyConfig, secondaryHotkeyConfig: HotkeyConfig?) {
+        self.buttons = buttons
+        self.hotkeyConfig = hotkeyConfig
+        self.secondaryHotkeyConfig = secondaryHotkeyConfig
+        self.version = "1.0"
     }
 }
 
@@ -263,6 +278,77 @@ class ButtonConfigManager: ObservableObject {
 
     func clearSecondaryHotkey() {
         secondaryHotkeyConfig = nil
+    }
+    
+    func exportConfig() -> Data? {
+        let config = SmartTabConfig(
+            buttons: buttons,
+            hotkeyConfig: hotkeyConfig,
+            secondaryHotkeyConfig: secondaryHotkeyConfig
+        )
+        return try? JSONEncoder().encode(config)
+    }
+    
+    func exportConfigToFile() -> URL? {
+        guard let data = exportConfig() else { return nil }
+        
+        let savePanel = NSSavePanel()
+        savePanel.allowedContentTypes = [.json]
+        savePanel.nameFieldStringValue = "SmartTab-Config.json"
+        savePanel.title = "Export SmartTab Configuration"
+        
+        if savePanel.runModal() == .OK {
+            guard let url = savePanel.url else { return nil }
+            do {
+                try data.write(to: url)
+                return url
+            } catch {
+                print("Failed to write config file: \(error)")
+                return nil
+            }
+        }
+        return nil
+    }
+    
+    func importConfig(from data: Data) -> Bool {
+        guard let config = try? JSONDecoder().decode(SmartTabConfig.self, from: data) else {
+            return false
+        }
+        
+        // Validate the imported config has the expected structure
+        guard !config.buttons.isEmpty else {
+            return false
+        }
+        
+        // Apply the imported configuration
+        buttons = config.buttons
+        hotkeyConfig = config.hotkeyConfig
+        secondaryHotkeyConfig = config.secondaryHotkeyConfig
+        
+        // Save to UserDefaults
+        saveConfigurations()
+        saveHotkeyConfig()
+        saveSecondaryHotkeyConfig()
+        
+        return true
+    }
+    
+    func importConfigFromFile() -> Bool {
+        let openPanel = NSOpenPanel()
+        openPanel.allowedContentTypes = [.json]
+        openPanel.allowsMultipleSelection = false
+        openPanel.canChooseDirectories = false
+        openPanel.canChooseFiles = true
+        openPanel.title = "Import SmartTab Configuration"
+        
+        if openPanel.runModal() == .OK {
+            guard let url = openPanel.url,
+                  let data = try? Data(contentsOf: url) else {
+                return false
+            }
+            return importConfig(from: data)
+        }
+        return false
     }
 
     private func makeButton(from definition: DefaultButtonDefinition) -> ButtonConfig {

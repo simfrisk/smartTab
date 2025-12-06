@@ -5,6 +5,49 @@
 	<key>logFormatVersion</key>
 	<integer>11</integer>
 	<key>logs</key>
-	<dict/>
+	<dict>
+		<key>8A8B39F0-D84A-4D3C-B7EC-EE7009324E73</key>
+		<dict>
+			<key>className</key>
+			<string>IDECommandLineBuildLog</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
+			<key>fileName</key>
+			<string>8A8B39F0-D84A-4D3C-B7EC-EE7009324E73.xcactivitylog</string>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>SmartTab project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>SmartTab</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Cleaning project SmartTab with scheme SmartTab and configuration Release</string>
+			<key>timeStartedRecording</key>
+			<real>786671687.74277902</real>
+			<key>timeStoppedRecording</key>
+			<real>786671687.98356295</real>
+			<key>title</key>
+			<string>Cleaning project SmartTab with scheme SmartTab and configuration Release</string>
+			<key>uniqueIdentifier</key>
+			<string>8A8B39F0-D84A-4D3C-B7EC-EE7009324E73</string>
+		</dict>
+	</dict>
 </dict>
 </plist>

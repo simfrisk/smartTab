@@ -67,6 +67,10 @@ struct PreferencesView: View {
     @State private var selectedButton: ButtonConfig?
     @State private var showingFilePicker = false
     @State private var filePickerType: ButtonConfig.ActionType = .launchApp
+    @State private var showingImportError = false
+    @State private var showingExportSuccess = false
+    @State private var showingImportSuccess = false
+    @State private var errorMessage = ""
     
     var body: some View {
         VStack(spacing: 0) {
@@ -76,12 +80,47 @@ struct PreferencesView: View {
                     .font(.title2)
                     .fontWeight(.bold)
                 Spacer()
-                Button("Done") {
-                    NSApplication.shared.keyWindow?.close()
+                HStack(spacing: 8) {
+                    Button("Export Config") {
+                        if let url = configManager.exportConfigToFile() {
+                            showingExportSuccess = true
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button("Import Config") {
+                        if configManager.importConfigFromFile() {
+                            showingImportSuccess = true
+                        } else {
+                            errorMessage = "Failed to import configuration. Please ensure the file is a valid SmartTab configuration."
+                            showingImportError = true
+                        }
+                    }
+                    .buttonStyle(.bordered)
+                    
+                    Button("Done") {
+                        NSApplication.shared.keyWindow?.close()
+                    }
+                    .buttonStyle(.borderedProminent)
                 }
             }
             .padding()
             .background(Color(NSColor.controlBackgroundColor))
+            .alert("Export Successful", isPresented: $showingExportSuccess) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Configuration exported successfully!")
+            }
+            .alert("Import Successful", isPresented: $showingImportSuccess) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Configuration imported successfully! The launcher will use the new settings.")
+            }
+            .alert("Import Failed", isPresented: $showingImportError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
             
             Divider()
             
