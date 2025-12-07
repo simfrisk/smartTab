@@ -314,6 +314,7 @@ SWIFT_CLASS("_TtC8SmartTab11AppDelegate")
 @end
 
 @class NSEvent;
+@protocol NSDraggingInfo;
 @class NSCoder;
 SWIFT_CLASS("_TtC8SmartTab21KeyEventContainerView")
 @interface KeyEventContainerView : NSView
@@ -322,6 +323,10 @@ SWIFT_CLASS("_TtC8SmartTab21KeyEventContainerView")
 - (void)viewDidMoveToWindow;
 - (void)drawRect:(NSRect)dirtyRect;
 - (void)keyDown:(NSEvent * _Nonnull)event;
+- (NSDragOperation)draggingEntered:(id <NSDraggingInfo> _Nonnull)sender SWIFT_WARN_UNUSED_RESULT;
+- (NSDragOperation)draggingUpdated:(id <NSDraggingInfo> _Nonnull)sender SWIFT_WARN_UNUSED_RESULT;
+- (void)draggingExited:(id <NSDraggingInfo> _Nullable)sender;
+- (BOOL)performDragOperation:(id <NSDraggingInfo> _Nonnull)sender SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)initWithFrame:(NSRect)frameRect OBJC_DESIGNATED_INITIALIZER;
 - (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
 @end
