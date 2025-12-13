@@ -1,0 +1,56 @@
+{
+  "" : {
+    "const-values" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary.swiftconstvalues",
+    "dependencies" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary.d",
+    "diagnostics" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary.dia",
+    "emit-module-dependencies" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary-emit-module.dia",
+    "pch" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTab-primary.swiftdeps"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/ButtonConfig.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/ButtonConfig.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/ButtonConfig.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/ButtonConfig.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/LauncherManager.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherManager.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherManager.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherManager.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/LauncherView.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherView.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherView.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherView.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/LauncherWindow.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherWindow.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherWindow.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/LauncherWindow.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/PreferencesView.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/PreferencesView.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/PreferencesView.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/PreferencesView.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/SmartTabApp.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTabApp.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTabApp.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/SmartTabApp.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/StatusBarManager.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/StatusBarManager.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/StatusBarManager.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/StatusBarManager.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/StatusBarSetupView.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/StatusBarSetupView.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/StatusBarSetupView.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/StatusBarSetupView.o"
+  },
+  "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/DerivedSources/GeneratedAssetSymbols.swift" : {
+    "index-unit-output-path" : "/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/GeneratedAssetSymbols.o",
+    "llvm-bc" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/GeneratedAssetSymbols.bc",
+    "object" : "/Users/simon/Documents/Pograming/smarttab/build/Build/Intermediates.noindex/SmartTab.build/Release/SmartTab.build/Objects-normal/arm64/GeneratedAssetSymbols.o"
+  }
+}
