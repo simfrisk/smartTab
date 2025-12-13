@@ -166,7 +166,7 @@ struct SmartTabApp: App {
     func openPreferences() {
         if preferencesWindow == nil {
             let window = NSWindow(
-                contentRect: NSRect(x: 0, y: 0, width: 700, height: 500),
+                contentRect: NSRect(x: 0, y: 0, width: 1400, height: 700),
                 styleMask: [.titled, .closable, .miniaturizable, .resizable],
                 backing: .buffered,
                 defer: false
@@ -177,6 +177,8 @@ struct SmartTabApp: App {
             window.center()
             preferencesWindow = window
         }
+        // Ensure window is centered and visible when shown
+        preferencesWindow?.center()
         preferencesWindow?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
     }

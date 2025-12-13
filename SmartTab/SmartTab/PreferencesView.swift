@@ -82,7 +82,7 @@ struct PreferencesView: View {
                 Spacer()
                 HStack(spacing: 8) {
                     Button("Export Config") {
-                        if let url = configManager.exportConfigToFile() {
+                        if configManager.exportConfigToFile() != nil {
                             showingExportSuccess = true
                         }
                     }

@@ -13,7 +13,7 @@ class LauncherManager: ObservableObject {
     private var hotKeyEventHandler: EventHandlerRef?
     private var hotkeyConfig: HotkeyConfig
     private var secondaryHotkeyConfig: HotkeyConfig?
-    private var hotkeyConfigCancellable: AnyCancellable?
+    // PHASE 3: Removed unused hotkeyConfigCancellable variable
 
     private static let hotKeySignature: FourCharCode = 0x534D5442 // 'SMTB'
     private static let hotKeyIdentifier: UInt32 = 1

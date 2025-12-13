@@ -48,10 +48,11 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
         containerView.launcherView = contentView
         containerView.launcherManager = launcherManager
         containerView.configManager = configManager
-        
+
         super.init(window: window)
-        window.delegate = self
-        
+        // PHASE 1.3: NSWindowController automatically sets itself as delegate
+        // Removed: window.delegate = self (prevents retain cycle)
+
         // Center the window on screen
         centerWindow()
     }
@@ -171,6 +172,17 @@ class LauncherWindowController: NSWindowController, NSWindowDelegate {
         // Close when window loses focus (user clicks away)
         launcherManager.isVisible = false
     }
+
+    deinit {
+        // PHASE 1.1: Ensure event monitors are always cleaned up
+        if let monitor = keyboardMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        if let monitor = mouseMonitor {
+            NSEvent.removeMonitor(monitor)
+        }
+        print("♻️ LauncherWindowController deallocated")
+    }
 }
 
 class KeyEventContainerView: NSView {
@@ -194,6 +206,10 @@ class KeyEventContainerView: NSView {
         super.viewDidMoveToWindow()
         if window != nil {
             setupDarkBackground()
+        } else {
+            // PHASE 1.2: Window is being removed - clean up timer
+            cancelHoverTimer()
+            currentHoveredButtonIndex = nil
         }
     }
     
@@ -505,6 +521,12 @@ class KeyEventContainerView: NSView {
         if !keepLauncherVisible {
             launcherManager?.isVisible = false
         }
+    }
+
+    deinit {
+        // PHASE 1.2: Clean up timer on deallocation
+        cancelHoverTimer()
+        print("♻️ KeyEventContainerView deallocated")
     }
 }
 

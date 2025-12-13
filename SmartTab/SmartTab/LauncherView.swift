@@ -398,6 +398,22 @@ struct LauncherButtonView: View {
     @State private var isHovered = false
     @State private var appIcon: NSImage?
     
+    // Check if this is a home row key (F or J)
+    private var isHomeRowKey: Bool {
+        button.key.uppercased() == "F" || button.key.uppercased() == "J"
+    }
+    
+    // Background color based on key type and hover state
+    private var backgroundColor: Color {
+        if isHovered {
+            return Color.accentColor.opacity(0.2)
+        } else if isHomeRowKey {
+            return Color.yellow.opacity(0.08)
+        } else {
+            return Color(NSColor.controlBackgroundColor)
+        }
+    }
+    
     var body: some View {
         ZStack(alignment: .topLeading) {
             // Main content - icon or letter
@@ -443,7 +459,7 @@ struct LauncherButtonView: View {
                 )
                 .padding(2)
         }
-        .background(isHovered ? Color.accentColor.opacity(0.2) : Color(NSColor.controlBackgroundColor))
+        .background(backgroundColor)
         .cornerRadius(8)
         .overlay(
             RoundedRectangle(cornerRadius: 8)
