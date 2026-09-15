@@ -112,12 +112,14 @@ struct SmartTabConfig: Codable {
     let buttons: [[ButtonConfig]]
     let hotkeyConfig: HotkeyConfig
     let secondaryHotkeyConfig: HotkeyConfig?
+    let shortcutsHotkeyConfig: HotkeyConfig?
     let version: String
-    
-    init(buttons: [[ButtonConfig]], hotkeyConfig: HotkeyConfig, secondaryHotkeyConfig: HotkeyConfig?) {
+
+    init(buttons: [[ButtonConfig]], hotkeyConfig: HotkeyConfig, secondaryHotkeyConfig: HotkeyConfig?, shortcutsHotkeyConfig: HotkeyConfig?) {
         self.buttons = buttons
         self.hotkeyConfig = hotkeyConfig
         self.secondaryHotkeyConfig = secondaryHotkeyConfig
+        self.shortcutsHotkeyConfig = shortcutsHotkeyConfig
         self.version = "1.0"
     }
 }
@@ -134,10 +136,16 @@ class ButtonConfigManager: ObservableObject {
             saveSecondaryHotkeyConfig()
         }
     }
+    @Published var shortcutsHotkeyConfig: HotkeyConfig? {
+        didSet {
+            saveShortcutsHotkeyConfig()
+        }
+    }
     private let defaults = UserDefaults.standard
     private let buttonsKey = "SmartTabButtonConfigs"
     private let hotkeyKey = "SmartTabHotkeyConfig"
     private let secondaryHotkeyKey = "SmartTabSecondaryHotkeyConfig"
+    private let shortcutsHotkeyKey = "SmartTabShortcutsHotkeyConfig"
 
     init() {
         if let data = defaults.data(forKey: hotkeyKey),
@@ -152,6 +160,13 @@ class ButtonConfigManager: ObservableObject {
             secondaryHotkeyConfig = decoded
         } else {
             secondaryHotkeyConfig = nil
+        }
+
+        if let data = defaults.data(forKey: shortcutsHotkeyKey),
+           let decoded = try? JSONDecoder().decode(HotkeyConfig.self, from: data) {
+            shortcutsHotkeyConfig = decoded
+        } else {
+            shortcutsHotkeyConfig = nil
         }
 
         loadConfigurations()
@@ -276,15 +291,31 @@ class ButtonConfigManager: ObservableObject {
         }
     }
 
+    func saveShortcutsHotkeyConfig() {
+        if let config = shortcutsHotkeyConfig,
+           let encoded = try? JSONEncoder().encode(config) {
+            defaults.set(encoded, forKey: shortcutsHotkeyKey)
+            print("Saved shortcuts-layer hotkey configuration: \(config.displayString())")
+        } else {
+            defaults.removeObject(forKey: shortcutsHotkeyKey)
+            print("Cleared shortcuts-layer hotkey configuration")
+        }
+    }
+
     func clearSecondaryHotkey() {
         secondaryHotkeyConfig = nil
+    }
+
+    func clearShortcutsHotkey() {
+        shortcutsHotkeyConfig = nil
     }
     
     func exportConfig() -> Data? {
         let config = SmartTabConfig(
             buttons: buttons,
             hotkeyConfig: hotkeyConfig,
-            secondaryHotkeyConfig: secondaryHotkeyConfig
+            secondaryHotkeyConfig: secondaryHotkeyConfig,
+            shortcutsHotkeyConfig: shortcutsHotkeyConfig
         )
         return try? JSONEncoder().encode(config)
     }
@@ -324,11 +355,13 @@ class ButtonConfigManager: ObservableObject {
         buttons = config.buttons
         hotkeyConfig = config.hotkeyConfig
         secondaryHotkeyConfig = config.secondaryHotkeyConfig
-        
+        shortcutsHotkeyConfig = config.shortcutsHotkeyConfig
+
         // Save to UserDefaults
         saveConfigurations()
         saveHotkeyConfig()
         saveSecondaryHotkeyConfig()
+        saveShortcutsHotkeyConfig()
         
         return true
     }

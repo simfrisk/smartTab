@@ -63,6 +63,7 @@ struct PreferencesView: View {
     @ObservedObject var launcherManager: LauncherManager
     @StateObject private var hotkeyRecorder = HotkeyRecorder()
     @StateObject private var secondaryHotkeyRecorder = HotkeyRecorder()
+    @StateObject private var shortcutsHotkeyRecorder = HotkeyRecorder()
     @State private var selectedTab = 0
     @State private var selectedButton: ButtonConfig?
     @State private var showingFilePicker = false
@@ -222,6 +223,62 @@ struct PreferencesView: View {
 
             Divider()
 
+            // Shortcuts Layer Hotkey Section
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Shortcuts Layer Hotkey (Optional)")
+                    .font(.headline)
+                    .padding(.horizontal)
+                    .padding(.top, 12)
+
+                HStack {
+                    Text("Opens media and capture controls directly:")
+                        .foregroundColor(.secondary)
+
+                    if let shortcutsConfig = configManager.shortcutsHotkeyConfig {
+                        Text(shortcutsConfig.displayString())
+                            .font(.system(.body, design: .monospaced))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(Color(NSColor.controlBackgroundColor))
+                            .cornerRadius(4)
+                    } else {
+                        Text("Not set")
+                            .foregroundColor(.secondary)
+                            .italic()
+                    }
+
+                    Spacer()
+
+                    if configManager.shortcutsHotkeyConfig != nil {
+                        Button("Clear") {
+                            configManager.clearShortcutsHotkey()
+                        }
+                        .buttonStyle(.bordered)
+                    }
+
+                    if shortcutsHotkeyRecorder.isRecording {
+                        Button("Cancel") {
+                            shortcutsHotkeyRecorder.stopRecording()
+                        }
+                        .buttonStyle(.bordered)
+
+                        Text("Press new hotkey...")
+                            .foregroundColor(.secondary)
+                            .font(.caption)
+                    } else {
+                        Button(configManager.shortcutsHotkeyConfig == nil ? "Set Shortcut" : "Reassign") {
+                            shortcutsHotkeyRecorder.startRecording()
+                        }
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 12)
+            }
+            .background(Color(NSColor.controlBackgroundColor).opacity(0.5))
+
+            Divider()
+
             HStack(spacing: 0) {
                 // Left side - visual keyboard
                 VStack(alignment: .leading, spacing: 0) {
@@ -262,7 +319,7 @@ struct PreferencesView: View {
                 .frame(maxHeight: .infinity)
             }
         }
-        .frame(minWidth: 1400, minHeight: 700)
+        .frame(minWidth: 1510, minHeight: 700)
         .onChange(of: hotkeyRecorder.recordedHotkey) { oldValue, newValue in
             if let newValue = newValue {
                 configManager.hotkeyConfig = newValue
@@ -271,6 +328,11 @@ struct PreferencesView: View {
         .onChange(of: secondaryHotkeyRecorder.recordedHotkey) { oldValue, newValue in
             if let newValue = newValue {
                 configManager.secondaryHotkeyConfig = newValue
+            }
+        }
+        .onChange(of: shortcutsHotkeyRecorder.recordedHotkey) { oldValue, newValue in
+            if let newValue = newValue {
+                configManager.shortcutsHotkeyConfig = newValue
             }
         }
     }
@@ -478,7 +540,7 @@ struct KeyboardLayoutView: View {
                         }
                     )
                 }
-                Spacer().frame(width: 24) // Gap for split keyboard
+                Spacer().frame(width: 80) // Gap for split keyboard
                 ForEach(Array(allButtons.dropFirst(5).prefix(5)), id: \.id) { button in
                     KeyboardKeyView(
                         button: button,
@@ -501,7 +563,7 @@ struct KeyboardLayoutView: View {
                         }
                     )
                 }
-                Spacer().frame(width: 24) // Gap for split keyboard
+                Spacer().frame(width: 80) // Gap for split keyboard
                 ForEach(Array(allButtons.dropFirst(15).prefix(5)), id: \.id) { button in
                     KeyboardKeyView(
                         button: button,
@@ -524,7 +586,7 @@ struct KeyboardLayoutView: View {
                         }
                     )
                 }
-                Spacer().frame(width: 24) // Gap for split keyboard
+                Spacer().frame(width: 80) // Gap for split keyboard
                 ForEach(Array(allButtons.dropFirst(25).prefix(5)), id: \.id) { button in
                     KeyboardKeyView(
                         button: button,

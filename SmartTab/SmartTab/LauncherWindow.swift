@@ -215,16 +215,14 @@ class KeyEventContainerView: NSView {
     
     private func setupDarkBackground() {
         wantsLayer = true
-        layer?.backgroundColor = NSColor.black.withAlphaComponent(0.3).cgColor
+        layer?.backgroundColor = NSColor.clear.cgColor
 
         // Register for drag-and-drop
         registerForDraggedTypes([.fileURL, .string, .URL, .tiff, .png, .pdf])
     }
     
     override func draw(_ dirtyRect: NSRect) {
-        // Draw dark semi-transparent background
-        NSColor.black.withAlphaComponent(0.3).setFill()
-        dirtyRect.fill()
+        // Clear background - LauncherView handles its own background
         super.draw(dirtyRect)
     }
     
@@ -482,7 +480,7 @@ class KeyEventContainerView: NSView {
         // Use existing executeAction logic from LauncherView
         // Hide the launcher after switching so user can see where to drop the file
         switch button.action {
-        case .none:
+        case .none, .mediaKey, .screenCapture:
             break
         case .launchApp(let path):
             launchApp(at: path, keepLauncherVisible: false)

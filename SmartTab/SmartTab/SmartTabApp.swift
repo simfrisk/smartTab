@@ -57,7 +57,7 @@ struct SmartTabApp: App {
     init() {
         let configManager = ButtonConfigManager()
         _configManager = StateObject(wrappedValue: configManager)
-        _launcherManager = StateObject(wrappedValue: LauncherManager(hotkeyConfig: configManager.hotkeyConfig, secondaryHotkeyConfig: configManager.secondaryHotkeyConfig))
+        _launcherManager = StateObject(wrappedValue: LauncherManager(hotkeyConfig: configManager.hotkeyConfig, secondaryHotkeyConfig: configManager.secondaryHotkeyConfig, shortcutsHotkeyConfig: configManager.shortcutsHotkeyConfig))
 
         // Ensure the app is set up as an accessory (background) app
         // This is important for global hotkeys to work
@@ -146,6 +146,10 @@ struct SmartTabApp: App {
         }
         .onChange(of: configManager.secondaryHotkeyConfig) { oldValue, newValue in
             launcherManager.updateSecondaryHotkeyConfig(newValue)
+            statusBarManager.updateMenu()
+        }
+        .onChange(of: configManager.shortcutsHotkeyConfig) { oldValue, newValue in
+            launcherManager.updateShortcutsHotkeyConfig(newValue)
             statusBarManager.updateMenu()
         }
         .onChange(of: launcherManager.isVisible) { oldValue, newValue in

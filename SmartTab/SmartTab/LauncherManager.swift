@@ -5,23 +5,35 @@ import ApplicationServices
 import Carbon
 
 class LauncherManager: ObservableObject {
-    @Published var isVisible = false
+    @Published var isVisible = false {
+        didSet {
+            // The window is reused between showings, so always reopen on the apps layer
+            if !isVisible {
+                currentLayer = .apps
+            }
+        }
+    }
+    @Published var currentLayer: AppLayer = .apps
     private var globalMonitor: Any?
     private var localMonitor: Any?
     private var hotKeyRef: EventHotKeyRef?
     private var secondaryHotKeyRef: EventHotKeyRef?
+    private var shortcutsHotKeyRef: EventHotKeyRef?
     private var hotKeyEventHandler: EventHandlerRef?
     private var hotkeyConfig: HotkeyConfig
     private var secondaryHotkeyConfig: HotkeyConfig?
+    private var shortcutsHotkeyConfig: HotkeyConfig?
     // PHASE 3: Removed unused hotkeyConfigCancellable variable
 
     private static let hotKeySignature: FourCharCode = 0x534D5442 // 'SMTB'
     private static let hotKeyIdentifier: UInt32 = 1
     private static let secondaryHotKeyIdentifier: UInt32 = 2
+    fileprivate static let shortcutsHotKeyIdentifier: UInt32 = 3
 
-    init(hotkeyConfig: HotkeyConfig = HotkeyConfig(), secondaryHotkeyConfig: HotkeyConfig? = nil) {
+    init(hotkeyConfig: HotkeyConfig = HotkeyConfig(), secondaryHotkeyConfig: HotkeyConfig? = nil, shortcutsHotkeyConfig: HotkeyConfig? = nil) {
         self.hotkeyConfig = hotkeyConfig
         self.secondaryHotkeyConfig = secondaryHotkeyConfig
+        self.shortcutsHotkeyConfig = shortcutsHotkeyConfig
         setupGlobalHotkey()
     }
 
@@ -34,10 +46,16 @@ class LauncherManager: ObservableObject {
         secondaryHotkeyConfig = config
         setupGlobalHotkey()
     }
-    
+
+    func updateShortcutsHotkeyConfig(_ config: HotkeyConfig?) {
+        shortcutsHotkeyConfig = config
+        setupGlobalHotkey()
+    }
+
     private func removeMonitors() {
         unregisterCarbonHotKey()
         unregisterSecondaryCarbonHotKey()
+        unregisterShortcutsCarbonHotKey()
 
         if let monitor = globalMonitor {
             NSEvent.removeMonitor(monitor)
@@ -68,6 +86,15 @@ class LauncherManager: ObservableObject {
                 print("⚠️ Unable to register secondary Carbon hotkey. It will be handled by the fallback monitor.")
             }
         }
+
+        // Register shortcuts-layer hotkey if configured
+        if let shortcutsConfig = shortcutsHotkeyConfig {
+            if registerShortcutsCarbonHotKey() {
+                print("✅ Shortcuts-layer Carbon hotkey registered. Press \(shortcutsConfig.displayString()) to open the shortcuts layer.")
+            } else {
+                print("⚠️ Unable to register shortcuts-layer Carbon hotkey. It will be handled by the fallback monitor.")
+            }
+        }
     }
     
     // Function to re-check permissions and re-setup hotkey (call after granting permissions)
@@ -86,6 +113,29 @@ class LauncherManager: ObservableObject {
             }
         }
     }
+
+    /// Opens the launcher straight on the shortcuts layer, switches to it if the
+    /// launcher is already showing the apps layer, and closes if already there.
+    func toggleShortcutsLayer() {
+        if Thread.isMainThread {
+            performShortcutsLayerToggle()
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.performShortcutsLayerToggle()
+            }
+        }
+    }
+
+    private func performShortcutsLayerToggle() {
+        if !isVisible {
+            currentLayer = .shortcuts
+            isVisible = true
+        } else if currentLayer == .apps {
+            currentLayer = .shortcuts
+        } else {
+            isVisible = false
+        }
+    }
     
     deinit {
         removeMonitors()
@@ -102,10 +152,22 @@ private extension LauncherManager {
         var eventType = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
         let userData = UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
         
-        let status = InstallEventHandler(GetApplicationEventTarget(), { _, _, userData in
+        let status = InstallEventHandler(GetApplicationEventTarget(), { _, event, userData in
             guard let userData else { return noErr }
             let launcherManager = Unmanaged<LauncherManager>.fromOpaque(userData).takeUnretainedValue()
-            launcherManager.handleCarbonHotKey()
+
+            var hotKeyID = EventHotKeyID()
+            if let event = event {
+                GetEventParameter(event,
+                                  EventParamName(kEventParamDirectObject),
+                                  EventParamType(typeEventHotKeyID),
+                                  nil,
+                                  MemoryLayout<EventHotKeyID>.size,
+                                  nil,
+                                  &hotKeyID)
+            }
+
+            launcherManager.handleCarbonHotKey(identifier: hotKeyID.id)
             return noErr
         }, 1, &eventType, userData, &hotKeyEventHandler)
         
@@ -173,12 +235,46 @@ private extension LauncherManager {
         }
     }
 
-    func handleCarbonHotKey() {
+    func registerShortcutsCarbonHotKey() -> Bool {
+        unregisterShortcutsCarbonHotKey()
+
+        guard let config = shortcutsHotkeyConfig else {
+            return false
+        }
+
+        let hotKeyID = EventHotKeyID(signature: Self.hotKeySignature, id: Self.shortcutsHotKeyIdentifier)
+        let modifiers = carbonModifiers(for: config)
+        let status = RegisterEventHotKey(UInt32(config.keyCode), modifiers, hotKeyID, GetApplicationEventTarget(), 0, &shortcutsHotKeyRef)
+
+        if status != noErr {
+            print("❌ RegisterEventHotKey (shortcuts layer) failed with status \(status)")
+            shortcutsHotKeyRef = nil
+            return false
+        }
+
+        print("✅ Registered shortcuts-layer Carbon hotkey: \(config.displayString())")
+        return true
+    }
+
+    func unregisterShortcutsCarbonHotKey() {
+        if let hotKeyRef = shortcutsHotKeyRef {
+            UnregisterEventHotKey(hotKeyRef)
+            self.shortcutsHotKeyRef = nil
+        }
+    }
+
+    func handleCarbonHotKey(identifier: UInt32) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            print("🌐 Carbon global hotkey detected: \(self.hotkeyConfig.displayString())")
             NSApp.activate(ignoringOtherApps: true)
-            self.isVisible.toggle()
+
+            if identifier == Self.shortcutsHotKeyIdentifier {
+                print("🌐 Carbon shortcuts-layer hotkey detected")
+                self.performShortcutsLayerToggle()
+            } else {
+                print("🌐 Carbon global hotkey detected: \(self.hotkeyConfig.displayString())")
+                self.isVisible.toggle()
+            }
         }
     }
     
@@ -221,6 +317,14 @@ private extension LauncherManager {
                     NSApp.activate(ignoringOtherApps: true)
                     self.isVisible.toggle()
                 }
+            } else if let shortcutsConfig = self.shortcutsHotkeyConfig,
+                      shortcutsConfig.matches(event: event) {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    print("🌐 Shortcuts-layer global hotkey detected via fallback monitor: \(shortcutsConfig.displayString())")
+                    NSApp.activate(ignoringOtherApps: true)
+                    self.toggleShortcutsLayer()
+                }
             }
         }
         
@@ -250,6 +354,14 @@ private extension LauncherManager {
                     guard let self = self else { return }
                     print("⌨️ Local secondary hotkey detected via fallback monitor: \(secondaryConfig.displayString())")
                     self.isVisible.toggle()
+                }
+                return nil
+            } else if let shortcutsConfig = self.shortcutsHotkeyConfig,
+                      shortcutsConfig.matches(event: event) {
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    print("⌨️ Local shortcuts-layer hotkey detected via fallback monitor: \(shortcutsConfig.displayString())")
+                    self.toggleShortcutsLayer()
                 }
                 return nil
             }
