@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>logFormatVersion</key>
-	<integer>11</integer>
+	<integer>12</integer>
 	<key>logs</key>
 	<dict>
-		<key>8A8B39F0-D84A-4D3C-B7EC-EE7009324E73</key>
+		<key>E8F9F320-2E88-4C59-986B-65188FC39ECD</key>
 		<dict>
 			<key>className</key>
 			<string>IDECommandLineBuildLog</string>
@@ -15,7 +15,7 @@
 			<key>domainType</key>
 			<string>Xcode.IDEActivityLogDomainType.BuildLog</string>
 			<key>fileName</key>
-			<string>8A8B39F0-D84A-4D3C-B7EC-EE7009324E73.xcactivitylog</string>
+			<string>E8F9F320-2E88-4C59-986B-65188FC39ECD.xcactivitylog</string>
 			<key>hasPrimaryLog</key>
 			<true/>
 			<key>primaryObservable</key>
@@ -40,13 +40,13 @@
 			<key>signature</key>
 			<string>Cleaning project SmartTab with scheme SmartTab and configuration Release</string>
 			<key>timeStartedRecording</key>
-			<real>786671687.74277902</real>
+			<real>788119753.70848501</real>
 			<key>timeStoppedRecording</key>
-			<real>786671687.98356295</real>
+			<real>788119754.04567599</real>
 			<key>title</key>
 			<string>Cleaning project SmartTab with scheme SmartTab and configuration Release</string>
 			<key>uniqueIdentifier</key>
-			<string>8A8B39F0-D84A-4D3C-B7EC-EE7009324E73</string>
+			<string>E8F9F320-2E88-4C59-986B-65188FC39ECD</string>
 		</dict>
 	</dict>
 </dict>

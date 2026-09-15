@@ -1,5 +1,24 @@
 {
   "source": "/Users/simon/Documents/Pograming/smarttab/SmartTab/SmartTab/LauncherView.swift",
-  "tables": {},
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "🎛 Shortcuts (Tab)",
+        "location": {
+          "startingColumn": 66,
+          "startingLine": 207
+        }
+      },
+      {
+        "comment": "",
+        "key": "⌨️ App Launcher (Tab)",
+        "location": {
+          "startingColumn": 91,
+          "startingLine": 207
+        }
+      }
+    ]
+  },
   "version": 1
 }

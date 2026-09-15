@@ -1,0 +1,12 @@
+# Build output
+build/
+DerivedData/
+*.o
+*.swiftmodule
+
+# Xcode user state
+*.xcuserstate
+xcuserdata/
+
+# macOS
+.DS_Store
